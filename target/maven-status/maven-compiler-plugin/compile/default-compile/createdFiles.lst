@@ -1,0 +1,5 @@
+com/tnt/configs/DispatcherServletInitializer.class
+com/tnt/pojos/User.class
+com/tnt/configs/WebApplicationContextConfig.class
+com/tnt/controllers/HomeController.class
+com/tnt/configs/HibernateConfig.class
