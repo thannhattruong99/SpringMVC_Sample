@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 
 /**
@@ -20,7 +21,7 @@ import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
  * @author truongtn
  */
 @Configuration
-@PropertySource("classpath:database.properties")
+@PropertySource("classpath:databases.properties")
 public class HibernateConfig {
     @Autowired
     private Environment env;
@@ -51,5 +52,14 @@ public class HibernateConfig {
         props.setProperty(org.hibernate.cfg.Environment.DIALECT, env.getProperty("hibernate.dialect"));
         
         return props;
+    }
+    
+    @Bean
+    public HibernateTransactionManager transactionManager(){
+        HibernateTransactionManager h = new HibernateTransactionManager();
+        
+        h.setSessionFactory(getSessionFactory().getObject());
+        
+        return h;
     }
 }

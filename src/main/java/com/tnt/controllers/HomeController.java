@@ -6,15 +6,13 @@
 package com.tnt.controllers;
 
 import com.tnt.pojos.User;
-import java.util.ArrayList;
-import java.util.List;
+import com.tnt.service.CategoryService;
+import com.tnt.service.ProductService;
 import java.util.Map;
-import javax.persistence.Query;
-import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
  * @author truongtn
  */
 @Controller
+@ControllerAdvice
 public class HomeController {
 //    @RequestMapping("/")
 //    public String index(Model model, 
@@ -61,16 +60,24 @@ public class HomeController {
 //        
 //        return "index";
 //    }
-    
     @Autowired
-    private LocalSessionFactoryBean sessionFactory;
+    private CategoryService categoryService;
 
+    @Autowired
+    private ProductService productService;
+
+    @ModelAttribute
+    public void commonAttr(Model model){
+        model.addAttribute("categories", this.categoryService.getCategories());
+    }
+    
     @RequestMapping("/")
-    public String index(Model model) {
-        Session session = sessionFactory.getObject().openSession();
-        Query q = session.createQuery("From Category");
-        model.addAttribute("categories", q.getResultList());
-        session.close();
+    public String index(Model model, @RequestParam(required = false) Map<String, String> params) {
+        int page = Integer.parseInt(params.getOrDefault("page", "1"));
+        model.addAttribute("products", this.productService.getProducts(params.get("searchValue"), page));
+        model.addAttribute("counter", this.productService.countProduct());
+        //if tiles.xml has baselayout -> return page
+        //if tiles.xml has no baselayout -> find in InternalResourceViewResolver -> return page
         return "index";
     }
 
@@ -88,10 +95,8 @@ public class HomeController {
         return "index";
     }
 
-    @RequestMapping(path = "/test")
-    public String testRedirect(Model model) {
-        model.addAttribute("testMsg", "WELCOME REDIRECT!!!");
-
-        return "redirect:/hello/Truong";
+    @RequestMapping(path = "/cart")
+    public String cart(Model model) {
+        return "cart";
     }
 }
